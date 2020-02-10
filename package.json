@@ -1,0 +1,23 @@
+{
+  "name": "employee-tracker",
+  "version": "1.0.0",
+  "description": "My employee tracker",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cynthiarich/employee-tracker.git"
+  },
+  "author": "Cynthia Rich",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cynthiarich/employee-tracker/issues"
+  },
+  "homepage": "https://github.com/cynthiarich/employee-tracker#readme",
+  "dependencies": {
+    "inquirer": "^7.0.4",
+    "mysql": "^2.18.1"
+  }
+}
