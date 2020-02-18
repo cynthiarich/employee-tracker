@@ -1,3 +1,5 @@
+DROP DATABASE IF EXISTS eetracker_db;
+
 CREATE DATABASE eetracker_db;
 USE eetracker_db;
 
@@ -5,7 +7,7 @@ CREATE TABLE departments (
     departmentid INT NOT NULL AUTO_INCREMENT,
     dept_name VARCHAR(30) NOT NULL,
     PRIMARY KEY (departmentid)
-)
+);
 
 CREATE TABLE roles (
     roleid INT NOT NULL AUTO_INCREMENT,
@@ -18,10 +20,10 @@ CREATE TABLE roles (
         ON UPDATE CASCADE
         ON DELETE SET NULL,
 	PRIMARY KEY (roleid)
-)
+);
 
 CREATE TABLE employees (
-    eeid INT NOT NULL AUTO_INCREMENT,
+    employeeid INT NOT NULL AUTO_INCREMENT,
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR (30) NOT NULL,
     roleid INT,
@@ -33,8 +35,8 @@ CREATE TABLE employees (
     managerid INT,
     CONSTRAINT fk_ee
     FOREIGN KEY (managerid)
-        REFERENCES employees(eeid)
+        REFERENCES employees(employeeid)
         ON UPDATE CASCADE
         ON DELETE SET NULL,
-	PRIMARY KEY (eeid)
-)
+	PRIMARY KEY (employeeid)
+);

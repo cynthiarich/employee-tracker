@@ -17,6 +17,9 @@
   },
   "homepage": "https://github.com/cynthiarich/employee-tracker#readme",
   "dependencies": {
+    "@hapi/joi": "^17.1.0",
+    "console.table": "^0.10.0",
+    "dotenv": "^8.2.0",
     "inquirer": "^7.0.4",
     "mysql": "^2.18.1"
   }

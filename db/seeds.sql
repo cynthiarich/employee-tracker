@@ -8,11 +8,11 @@ INSERT INTO roles (title, salary, departmentid) VALUES
     ('Solution Architect', 100000, 3),
     ('Project Manager', 110000, 3),
     ('Product Manager', 120000, 4),
-    ('Program Manager', 120000, 4)
+    ('Program Manager', 120000, 4);
 
 INSERT INTO employees (first_name, last_name, roleid, managerid) VALUES
     ('Mickey', 'Mouse', 2, NULL),
     ('Donald', 'Duck', 1, 1),
     ('Goofy', 'Dog', 1, 1),
     ('Steamboat', 'Willy', 3, NULL),
-    ('Tugboat', 'Tom', 4, 4)
+    ('Tugboat', 'Tom', 4, 4);
