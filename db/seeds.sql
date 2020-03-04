@@ -10,9 +10,9 @@ INSERT INTO roles (title, salary, departmentid) VALUES
     ('Product Manager', 120000, 4),
     ('Program Manager', 120000, 4);
 
-INSERT INTO employees (first_name, last_name, roleid, managerid) VALUES
-    ('Mickey', 'Mouse', 2, NULL),
-    ('Donald', 'Duck', 1, 1),
-    ('Goofy', 'Dog', 1, 1),
-    ('Steamboat', 'Willy', 3, NULL),
-    ('Tugboat', 'Tom', 4, 4);
+INSERT INTO employees (first_name, last_name, is_manager, roleid, managerid) VALUES
+    ('Mickey', 'Mouse', true, 2, NULL),
+    ('Donald', 'Duck', false, 1, 1),
+    ('Goofy', 'Dog', false, 1, 1),
+    ('Steamboat', 'Willy', true, 3, NULL),
+    ('Tugboat', 'Tom', false, 4, 4);

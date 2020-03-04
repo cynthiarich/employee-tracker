@@ -38,15 +38,28 @@ const orm = {
         });
     },
 
-    some: (table, cols, cb) => {
-        let queryString = "SELECT " + cols.toString() + " FROM " + table + ";";
+    allBy: (table, where, cb) => {
+        let queryString = "SELECT * FROM " + table + ";";
         connection.query(queryString, (err, result) => {
             if (err) throw (err);
             cb(result);
-        })
+        });
     },
 
-    create: (table, cols, vals, cb) => {
+    find: (table, whereKey, whereVal, cb) => {
+        let queryString = "SELECT * FROM " + table + "WHERE " + whereKey + "=" + whereVal + ";";
+        connection.query(queryString, (err, result) => {
+            if (err) throw (err);
+            cb(result);
+        });
+    },
+
+    some: async (table, cols) => {
+        let queryString = "SELECT " + cols.toString() + " FROM " + table + ";";
+        return connection.query(queryString);
+    },
+
+    create: async (table, cols, vals) => {
         let queryString = "INSERT INTO " + table;
         queryString += " (";
         queryString += cols.toString();
@@ -55,10 +68,7 @@ const orm = {
         queryString += printQuestionMarks(vals.length);
         queryString += ")";
 
-        connection.query(queryString, vals, (err, result) => {
-            if (err) throw err;
-            cb(result);
-        });
+        return connection.query(queryString, vals, (err, result) => result);
     },
 
     update: (table, objColVals, condition, cb) => {

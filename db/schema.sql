@@ -26,6 +26,7 @@ CREATE TABLE employees (
     employeeid INT NOT NULL AUTO_INCREMENT,
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR (30) NOT NULL,
+    is_manager BOOLEAN DEFAULT false,
     roleid INT,
     CONSTRAINT fk_role
     FOREIGN KEY (roleid)
@@ -38,5 +39,5 @@ CREATE TABLE employees (
         REFERENCES employees(employeeid)
         ON UPDATE CASCADE
         ON DELETE SET NULL,
-	PRIMARY KEY (employeeid)
+    PRIMARY KEY (employeeid)
 );

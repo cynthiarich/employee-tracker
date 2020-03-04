@@ -1,10 +1,16 @@
 const cTable = require('console.table');
 const inquirer = require('inquirer');
 const joi = require("@hapi/joi");
-const orm = require("./config/orm")
+const orm = require("./config/orm");
+const employee = require("./controllers/employee");
+const role = require("./controllers/role");
+const manager = require("./controllers/manager");
+const department = require("./controllers/department");
 
+
+//initialize the app
 function init() {
-
+    //find out which action they would like to perform 
     inquirer.prompt(
         {
             type: "list",
@@ -20,11 +26,13 @@ function init() {
             validate: validateArr
         }
     ).then(data => {
+        //route user to appropriate function
         const { action } = data;
         if (action === "View") {
             getView();
         }
         else if (action === "Add" || action === "Update" || action === "Remove") {
+            //find out which model they want to take action on
             inquirer.prompt(
                 {
                     type: 'list',
@@ -41,28 +49,36 @@ function init() {
                 const { option } = data;
                 if (action === "Add") {
                     if (option === "Employee") {
-                        getNewEmployee();
+                        employee.getNew(init());
                     }
                     else if (option === "Role") {
-                        getNewRole();
+                        role.getNew(init());
                     }
                     else if (option === "Department") {
-                        getNewDepartment();
+                        department.getNew(init());
                     }
                 }
                 else if (action === "Update") {
                     if (option === "Employee") {
-                        updateEmployee();
+                        employee.update(init());
                     }
                     else if (option === "Role") {
-                        updateRole();
+                        role.update(init());
                     }
                     else if (option === "Department") {
-                        updateDepartment();
+                        department.update(init());
                     }
                 }
                 else if (action === "Remove") {
-                    getRemove(option);
+                    if (option === "Employee") {
+                        employee.remove(init());
+                    }
+                    else if (option === "Role") {
+                        role.remove(init());
+                    }
+                    else if (option === "Department") {
+                        department.remove(init());
+                    }
                 }
             });
         }
@@ -74,6 +90,7 @@ function init() {
 
 
 function getView() {
+    //find out which dataset they want to view
     const viewChoices = [
         "All employees",
         "Employee details",
@@ -97,7 +114,8 @@ function getView() {
         const { viewOption } = answer;
         viewOption.split(" ");
         if (viewOption[0] === "All"){
-            orm.all(viewOption, cb => {
+            //display all employees, roles, or departments based on selection
+            orm.all(viewOption[1], cb => {
                 console.log(`================= All ${viewOption} ==================`)
                 console.table(cb);
             })
@@ -109,7 +127,31 @@ function getView() {
             //include department
         }
         else if (viewOption[0] === "Employees") {
-            //all employees by department
+            //find out which department, role, or manager
+            inquirer.prompt(
+                {
+                    type: 'input',
+                    message: `Which ${viewOption[2]} would you like to view? (Type "List" for available options)`,
+                    name: 'selection',
+                    validate: value => {
+                        //does this record exist?
+                        orm.find(`${viewOption[2]}s`, value, cb => {
+                            console.log("=========== Does record exist? ========");
+                            console.log(cb);
+                        })
+
+                    }
+                }
+            ).then(answer =>
+            if (viewOption[2] === "department"){
+                //get list of all departments
+            } else if (viewOption[2] === "role") {
+                //get list of all roles
+            }
+            //inquirer prompt to get selection
+
+            orm.allby("employees", viewOption[2], cb => {
+                console.log(`=============== All ${viewOption[2]} employees ===========`)
             //all employees by role
             //all employees by manager
         }
@@ -121,55 +163,6 @@ function getView() {
         }
     });
 };
-
-function getNewEmployee() {
-    orm.some("roles", ["roleid", "title"], cb => {
-        inquirer.prompt([
-            {
-                type: 'input',
-                message: 'Employee first name:',
-                name: 'first_name'
-            },
-            {
-                type: 'input',
-                message: 'Employee last name:',
-                name: 'last_name'
-            },
-            {
-                type: "list",
-                message: "Choose the role from the list:",
-                name: "role",
-                choices: () => {
-                    let rlist = cb.map(obj => `${obj.roleid}: ${obj.title}`);
-                    return rlist;
-                }
-            }
-        ]).then(answers => {
-            orm.some("employees", ["employeeid", "first_name", "last_name"], cb => {
-                inquirer.prompt({
-                    type: "list",
-                    message: "Choose the manager from the list:",
-                    name: "manager",
-                    choices: () => {
-                        let mlist = cb.map(obj => `${obj.employeeid}: ${obj.first_name} ${obj.last_name}`);
-                        return mlist;
-                    }
-                }).then(mgr => {
-                    const { first_name, last_name, role } = answers;
-                    const { manager } = mgr;
-                    role.split(":");
-                    const roleInput = role[0];
-                    manager.split(":");
-                    const mgrInput = manager[0];
-                    orm.create("employees", ["first_name", "last_name", "roleid", "managerid"], [first_name, last_name, roleInput, mgrInput], cb => {
-                        console.log(cb);
-                        init();
-                    })
-                })
-            })
-        });
-    });
-}
 
 function getRemove(option) {
     orm.all(`${option.toLowerCase()}s`, cb => {
@@ -202,21 +195,6 @@ function getRemove(option) {
     })
 }
 
-
-//Role, add
-//choose department
-//Department, add
-
-function getUpdate(option) {
-
-    //Employee, update
-    //choose role
-    //choose manager
-    //Role, update
-    //choose department
-    //Department, update
-}
-
 function onValidation(err, val) {
     if (err) {
         console.log(err.message);
@@ -234,4 +212,3 @@ function validateArr(ops) {
 };
 
 init();
-
