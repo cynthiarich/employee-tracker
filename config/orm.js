@@ -33,7 +33,7 @@ const orm = {
     all: (table, cb) => {
         let queryString = "SELECT * FROM " + table + ";";
         connection.query(queryString, (err, result) => {
-            if (err) throw (err);
+            if (err) throw err;
             cb(result);
         });
     },
@@ -41,25 +41,63 @@ const orm = {
     allBy: (table, where, cb) => {
         let queryString = "SELECT * FROM " + table + ";";
         connection.query(queryString, (err, result) => {
-            if (err) throw (err);
+            if (err) throw err;
             cb(result);
         });
     },
 
     find: (table, whereKey, whereVal, cb) => {
-        let queryString = "SELECT * FROM " + table + "WHERE " + whereKey + "=" + whereVal + ";";
+        let queryString = "SELECT * FROM " + table + " WHERE " + whereKey + "=" + whereVal + ";";
         connection.query(queryString, (err, result) => {
-            if (err) throw (err);
+            if (err) throw err;
             cb(result);
         });
     },
 
-    some: async (table, cols) => {
-        let queryString = "SELECT " + cols.toString() + " FROM " + table + ";";
-        return connection.query(queryString);
+    findOR: (table, whereKey, whereVals, cb) => {
+        let queryString = "SELECT * FROM " + table;
+        queryString += " WHERE ";
+        whereVals.forEach((param, index) => {
+            queryString += whereKey + "=" + param;
+            if (index !== whereVals.length - 1) {
+                queryString += " OR ";
+            }
+        })
+        connection.query(queryString, (err, result) => {
+            if (err) throw err;
+            cb(result);
+        });
     },
 
-    create: async (table, cols, vals) => {
+    count: (table, whereKey, whereVal, cb) => {
+        let queryString = "SELECT COUNT(*) AS eeCount FROM " + table;
+        queryString += " WHERE ";
+        queryString += whereKey + "=" + whereVal;
+        connection.query(queryString, (err, result) => {
+            if (err) throw err;
+            cb(result);
+        });
+    },
+
+    some: (table, cols, cb) => {
+        let queryString = "SELECT " + cols.toString() + " FROM " + table + ";";
+        connection.query(queryString, (err, result) => {
+            if (err) throw err;
+            cb(result);
+        });
+    },
+
+    someWHERE: (table, cols, whereKey, whereVal, cb) => {
+        let queryString = "SELECT " + cols.toString();
+        queryString += " FROM " + table;
+        queryString += " WHERE " + whereKey + "=" + whereVal + ";";
+        connection.query(queryString, (err, result) => {
+            if (err) throw err;
+            cb(result);
+        });
+    },
+
+    create: (table, cols, vals, cb) => {
         let queryString = "INSERT INTO " + table;
         queryString += " (";
         queryString += cols.toString();
@@ -68,23 +106,23 @@ const orm = {
         queryString += printQuestionMarks(vals.length);
         queryString += ")";
 
-        return connection.query(queryString, vals, (err, result) => result);
+        connection.query(queryString, vals, (err, result) => {
+            if (err) throw err;
+            cb(result);
+        });
     },
 
-    update: (table, objColVals, condition, cb) => {
+    update: (table, newVals, condition, cb) => {
         let queryString = "UPDATE " + table;
 
         queryString += " SET ";
-        queryString += objToSql(objColVals);
+        queryString += newVals;
         queryString += " WHERE ";
         queryString += condition;
 
         console.log(queryString);
-        connection.query(queryString, function (err, result) {
-            if (err) {
-                throw err;
-            }
-
+        connection.query(queryString, (err, result) => {
+            if (err) throw err;
             cb(result);
         });
     },
@@ -97,7 +135,16 @@ const orm = {
 
         connection.query(queryString, (err, result) => {
             if (err) throw err;
+            cb(result);
+        });
+    }, 
 
+    salaries: (id, cb) => {
+        let queryString = "SELECT SUM(T2.salary) AS total_salaries";
+        queryString += " FROM employees T1 LEFT JOIN roles T2 ON T1.roleid = T2.roleid";
+        queryString += " WHERE T2.departmentid=" + id + ";"
+        connection.query(queryString, (err, result) => {
+            if (err) throw err;
             cb(result);
         });
     }

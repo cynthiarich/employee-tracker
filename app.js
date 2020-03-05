@@ -49,35 +49,35 @@ function init() {
                 const { option } = data;
                 if (action === "Add") {
                     if (option === "Employee") {
-                        employee.getNew(init());
+                        employee.getNew(cb => init());
                     }
                     else if (option === "Role") {
-                        role.getNew(init());
+                        role.getNew(cb => init());
                     }
                     else if (option === "Department") {
-                        department.getNew(init());
+                        department.getNew(cb => init());
                     }
                 }
                 else if (action === "Update") {
                     if (option === "Employee") {
-                        employee.update(init());
+                        employee.update(cb => init());
                     }
                     else if (option === "Role") {
-                        role.update(init());
+                        role.update(cb => init());
                     }
                     else if (option === "Department") {
-                        department.update(init());
+                        department.update(cb => init());
                     }
                 }
                 else if (action === "Remove") {
                     if (option === "Employee") {
-                        employee.remove(init());
+                        employee.remove(cb => init());
                     }
                     else if (option === "Role") {
-                        role.remove(init());
+                        role.remove(cb => init());
                     }
                     else if (option === "Department") {
-                        department.remove(init());
+                        department.remove(cb => init());
                     }
                 }
             });
@@ -112,87 +112,37 @@ function getView() {
         }
     ).then(answer => {
         const { viewOption } = answer;
-        viewOption.split(" ");
-        if (viewOption[0] === "All"){
+        const viewArr = viewOption.split(" ");
+        if (viewArr[0] === "All") {
             //display all employees, roles, or departments based on selection
-            orm.all(viewOption[1], cb => {
-                console.log(`================= All ${viewOption} ==================`)
+            orm.all(viewArr[1], cb => {
+                console.log(`================= All ${viewArr[1]}s ==================`)
                 console.table(cb);
-            })
-        }
-        else if (viewOption[1] === "details") {
-            //show details for a single employee
-            //include role title, salary
-            //include manager title
-            //include department
-        }
-        else if (viewOption[0] === "Employees") {
-            //find out which department, role, or manager
-            inquirer.prompt(
-                {
-                    type: 'input',
-                    message: `Which ${viewOption[2]} would you like to view? (Type "List" for available options)`,
-                    name: 'selection',
-                    validate: value => {
-                        //does this record exist?
-                        orm.find(`${viewOption[2]}s`, value, cb => {
-                            console.log("=========== Does record exist? ========");
-                            console.log(cb);
-                        })
-
-                    }
-                }
-            ).then(answer =>
-            if (viewOption[2] === "department"){
-                //get list of all departments
-            } else if (viewOption[2] === "role") {
-                //get list of all roles
-            }
-            //inquirer prompt to get selection
-
-            orm.allby("employees", viewOption[2], cb => {
-                console.log(`=============== All ${viewOption[2]} employees ===========`)
-            //all employees by role
-            //all employees by manager
-        }
-        else if (viewOption[0] === "Roles") {
-            //all roles by department
-        }
-        else if (viewOption[0] === "Total") {
-            //total budget for a department
-        }
-    });
-};
-
-function getRemove(option) {
-    orm.all(`${option.toLowerCase()}s`, cb => {
-        inquirer.prompt({
-            type: 'list',
-            message: `Which ${option} would you like to remove?`,
-            name: "selected",
-            choices: () => {
-                let slist = [];
-                if (option === "Employee") {
-                    slist = cb.map(obj => `${obj.employeeid}: ${obj.first_name} ${obj.last_name}`);
-                }
-                else if (option === "Role") {
-                    slist = cb.map(obj => `${obj.roleid}: ${obj.title}`);  
-                }
-                else if (option === "Department") {
-                    slist = cb.map(obj => `${obj.departmentid}: ${obj.department_name}`);  
-                }
-                return slist;
-            }
-        }).then(answer => {
-            const { selected } = answer;
-            selected.split(":");
-            const delValue = selected[0];
-            orm.delete(`${option.toLowerCase()}s`, `${option.toLowerCase()}id`, delValue, cb => {
-                console.log(cb);
                 init();
             })
-        })
-    })
+        }
+        else if (viewArr[1] === "details") {
+            employee.details(cb => init());
+        }
+        else if (viewArr[0] === "Employees") {
+            //find out which department, role, or manager
+            if (viewArr[2] === "department"){
+                department.allEmployees(cb => init());
+            }
+            else if (viewArr[2] === "role") {
+                role.allEmployees(cb => init());
+            }
+            else if (viewArr[2] === "manager"){
+                manager.allEmployees(cb => init());
+            }
+        }
+        else if (viewArr[0] === "Roles") {
+            department.allRoles(cb => init());
+        }
+        else if (viewArr[0] === "Total") {
+            department.budget(cb => init());
+        }
+    });
 }
 
 function onValidation(err, val) {
